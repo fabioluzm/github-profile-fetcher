@@ -205,9 +205,11 @@
 
         try {
           // FIXED STRINGS: Explicit directory forward slashes separating resource paths
-          const userUrl = 'https://github.com' + username;
+          const userUrl = 'https://github.com/' + username;
           const reposUrl =
-            'https://github.com' + username + '/repos?per_page=15&sort=updated';
+            'https://github.com/' +
+            username +
+            '/repos?per_page=15&sort=updated';
 
           const userRes = await fetch(userUrl, {
             headers: { Accept: 'application/vnd.github+json' },
