@@ -1,9 +1,36 @@
-# 👤 GitHub Profile Report: DBugster
+# 👤 GitHub Profile Report: Fabio Moreira
 
 **Bio:** No bio available.
-**Public Repos:** 3 | **Followers:** 0
+**Public Repos:** 33 | **Followers:** 5
 
 ### 📦 Top Public Repositories (Recently Updated)
-- [PyToDo](https://github.com/DBugster/PyToDo) (Python)
-- [ReStore](https://github.com/DBugster/ReStore) (C#)
-- [DBugster](https://github.com/DBugster/DBugster)
+- [github-profile-fetcher](https://github.com/fabioluzm/github-profile-fetcher) (Python)
+- [photo-gallery](https://github.com/fabioluzm/photo-gallery)
+- [calendario-de-cuidados](https://github.com/fabioluzm/calendario-de-cuidados) (JavaScript)
+- [paradigmadb](https://github.com/fabioluzm/paradigmadb) (PHP)
+- [exercise-tracker-client](https://github.com/fabioluzm/exercise-tracker-client) (JavaScript)
+- [musicmaster](https://github.com/fabioluzm/musicmaster) (JavaScript)
+- [docker-development-environment](https://github.com/fabioluzm/docker-development-environment) (Makefile)
+- [ai-pong-game](https://github.com/fabioluzm/ai-pong-game) (JavaScript)
+- [complete-javascript-course](https://github.com/fabioluzm/complete-javascript-course) (JavaScript)
+- [react-hook-form-material-ui](https://github.com/fabioluzm/react-hook-form-material-ui)
+- [create-app-template](https://github.com/fabioluzm/create-app-template) (JavaScript)
+- [projects](https://github.com/fabioluzm/projects) (HTML)
+- [expense-tracker](https://github.com/fabioluzm/expense-tracker) (JavaScript)
+- [sass-structure](https://github.com/fabioluzm/sass-structure) (SCSS)
+- [frontend-mentor-challenges](https://github.com/fabioluzm/frontend-mentor-challenges)
+- [hangman](https://github.com/fabioluzm/hangman) (JavaScript)
+- [github-feel-good](https://github.com/fabioluzm/github-feel-good)
+- [project-template](https://github.com/fabioluzm/project-template) (JavaScript)
+- [bootstrap-templates](https://github.com/fabioluzm/bootstrap-templates)
+- [exercise-tracker-server](https://github.com/fabioluzm/exercise-tracker-server) (JavaScript)
+- [action-rpg-game](https://github.com/fabioluzm/action-rpg-game) (GDScript)
+- [puzzle-game](https://github.com/fabioluzm/puzzle-game) (GDScript)
+- [flashcards](https://github.com/fabioluzm/flashcards) (HTML)
+- [countdown](https://github.com/fabioluzm/countdown) (JavaScript)
+- [sass_mixins](https://github.com/fabioluzm/sass_mixins) (CSS)
+- [fibonacci-sequence](https://github.com/fabioluzm/fibonacci-sequence) (JavaScript)
+- [change-calculator](https://github.com/fabioluzm/change-calculator) (HTML)
+- [stisla](https://github.com/fabioluzm/stisla) (HTML)
+- [tictactoe](https://github.com/fabioluzm/tictactoe) (Lua)
+- [draw](https://github.com/fabioluzm/draw) (HTML)
