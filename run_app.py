@@ -4,7 +4,7 @@ import requests
 import jwt
 
 # Read configurations from GitHub Secrets
-APP_ID = os.getenv("GITHUB_APP_ID")
+APP_ID = os.getenv("APP_ID")
 PRIVATE_KEY_PATH = "private_key.pem"
 
 def generate_jwt():

@@ -10,8 +10,8 @@ import requests
 load_dotenv()
 
 # Read the values securely from the environment variables
-APP_ID = os.getenv("GITHUB_APP_ID")
-PRIVATE_KEY_PATH = os.getenv("GITHUB_PRIVATE_KEY_PATH")
+APP_ID = os.getenv("APP_ID")
+PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 
 class GitHubAppAuthViewer:
     def __init__(self, root):
@@ -31,10 +31,10 @@ class GitHubAppAuthViewer:
 
     def check_configuration(self):
         """Validates that environment configurations were loaded successfully."""
-        if not APP_ID or not PRIVATE_KEY_PATH:
+        if not APP_ID or not PRIVATE_KEY:
             messagebox.showerror(
                 "Configuration Error", 
-                "Missing environment configuration variables.\n\nPlease ensure your local '.env' file contains valid definitions for:\n- GITHUB_APP_ID\n- GITHUB_PRIVATE_KEY_PATH"
+                "Missing environment configuration variables.\n\nPlease ensure your local '.env' file contains valid definitions for:\n- APP_ID\n- PRIVATE_KEY"
             )
 
     def setup_ui(self):
@@ -94,10 +94,10 @@ class GitHubAppAuthViewer:
     def generate_jwt(self):
         """Reads local private key file and signs a secure JWT token for GitHub."""
         try:
-            with open(PRIVATE_KEY_PATH, "r") as key_file:
+            with open(PRIVATE_KEY, "r") as key_file:
                 private_key = key_file.read()
         except FileNotFoundError:
-            messagebox.showerror("File Error", f"Could not locate private key file at:\n{PRIVATE_KEY_PATH}")
+            messagebox.showerror("File Error", f"Could not locate private key file at:\n{PRIVATE_KEY}")
             return None
 
         now = int(time.time())
