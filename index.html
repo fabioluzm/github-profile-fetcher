@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub App Frontend Dashboard</title>
+    <style>
+      :root {
+        --bg-canvas: #0d1117;
+        --bg-surface: #161b22;
+        --bg-button: #21262d;
+        --bg-button-hover: #30363d;
+        --text-primary: #f0f6fc;
+        --text-secondary: #8b949e;
+        --accent-blue: #58a6ff;
+        --border-default: #30363d;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
+          sans-serif;
+        background-color: var(--bg-canvas);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 40px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 500px;
+        background-color: var(--bg-surface);
+        padding: 24px;
+        border-radius: 6px;
+        border: 1px solid var(--border-default);
+        box-sizing: border-box;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      h2 {
+        margin-top: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--accent-blue);
+      }
+
+      .input-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      input {
+        flex: 1;
+        background-color: var(--bg-canvas);
+        color: var(--text-primary);
+        border: 1px solid var(--border-default);
+        padding: 8px 12px;
+        font-size: 14px;
+        border-radius: 6px;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: var(--accent-blue);
+      }
+
+      button {
+        background-color: var(--bg-button);
+        color: var(--text-primary);
+        border: 1px solid var(--border-default);
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: var(--bg-button-hover);
+      }
+
+      .dashboard-card {
+        width: 100%;
+        max-width: 500px;
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-default);
+        border-radius: 6px;
+        padding: 24px;
+        box-sizing: border-box;
+        display: none;
+      }
+
+      .profile-bio {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin: 12px 0;
+        line-height: 1.5;
+        text-align: left;
+      }
+
+      .profile-stats {
+        font-size: 14px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-default);
+        text-align: left;
+      }
+
+      .repo-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 250px;
+        overflow-y: auto;
+        text-align: left;
+      }
+
+      .repo-item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-default);
+        font-size: 14px;
+      }
+
+      .repo-item:last-child {
+        border-bottom: none;
+      }
+
+      .repo-item a {
+        color: var(--accent-blue);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .repo-item a:hover {
+        text-decoration: underline;
+      }
+
+      .error-msg {
+        color: #ff7b72;
+        font-size: 14px;
+        margin-top: 12px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>GitHub Web Profile Dashboard</h2>
+      <div class="input-group">
+        <input
+          type="text"
+          id="usernameInput"
+          placeholder="Type a GitHub username..."
+        />
+        <button onclick="fetchProfileData()">Search</button>
+      </div>
+      <div id="errorBox" class="error-msg"></div>
+    </div>
+
+    <div id="dashboardCard" class="dashboard-card">
+      <h3 id="profileName" style="margin: 0 0 4px 0; text-align: left">--</h3>
+      <div id="profileBio" class="profile-bio">--</div>
+      <div class="profile-stats">
+        Public Repos:
+        <span id="statRepos" style="color: var(--accent-blue)">0</span> |
+        Followers:
+        <span id="statFollowers" style="color: var(--accent-blue)">0</span>
+      </div>
+      <div
+        style="
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 10px;
+          text-align: left;
+        "
+      >
+        📦 Public Repositories:
+      </div>
+      <ul id="repoList" class="repo-list"></ul>
+    </div>
+
+    <script>
+      // Set up enter-key shortcut listen event listener
+      document
+        .getElementById('usernameInput')
+        .addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            fetchProfileData();
+          }
+        });
+
+      async function fetchProfileData() {
+        const username = document.getElementById('usernameInput').value.trim();
+        const errorBox = document.getElementById('errorBox');
+        const card = document.getElementById('dashboardCard');
+
+        if (!username) return;
+        errorBox.style.display = 'none';
+
+        // Clean try wrapper handles browser lookups smoothly
+        try {
+          const userRes = await fetch(`https://api.github.com/{username}`, {
+            headers: { Accept: 'application/vnd.github+json' },
+          });
+
+          if (userRes.status === 404) {
+            errorBox.innerText = `User '${username}' does not exist.`;
+            errorBox.style.display = 'block';
+            card.style.display = 'none';
+            return;
+          } else if (!userRes.ok) {
+            errorBox.innerText = `API error occurred. Status Code: ${userRes.status}`;
+            errorBox.style.display = 'block';
+            card.style.display = 'none';
+            return;
+          }
+
+          const userData = await userRes.json();
+
+          const reposRes = await fetch(
+            `https://api.github.com/{username}/repos?per_page=15&sort=updated`,
+          );
+          const reposData = await reposRes.json();
+
+          // Mapping outputs directly to DOM objects
+          document.getElementById('profileName').innerText =
+            userData.name || userData.login;
+          document.getElementById('profileBio').innerText =
+            userData.bio || 'No bio available.';
+          document.getElementById('statRepos').innerText =
+            userData.public_repos;
+          document.getElementById('statFollowers').innerText =
+            userData.followers;
+
+          const list = document.getElementById('repoList');
+          list.innerHTML = '';
+
+          reposData.forEach((repo) => {
+            const li = document.createElement('li');
+            li.className = 'repo-item';
+            li.innerHTML = `<a href="${repo.html_url}" target="_blank">📦 ${repo.name}</a> ${repo.language ? `<span style="color:var(--text-secondary); font-size:12px;">(${repo.language})</span>` : ''}`;
+            list.appendChild(li);
+          });
+
+          card.style.display = 'block';
+        } catch (err) {
+          errorBox.innerText =
+            'Network transmission error. Check your connection.';
+          errorBox.style.display = 'block';
+          card.style.display = 'none';
+        }
+      }
+    </script>
+  </body>
+</html>
