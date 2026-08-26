@@ -30,3 +30,12 @@ jobs:
         env:
           APP_ID: ${{ secrets.APP_ID }}
         run: python run_app.py
+
+      # ADD THIS FINAL STEP TO SAVE THE DATA RIGHT ON GITHUB
+      - name: Commit and Save the Profile Report
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@://github.com"
+          git add profile_report.md || true
+          git commit -m "Docs: update fetched profile report markdown asset [skip ci]" || true
+          git push || true
