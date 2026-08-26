@@ -1,7 +1,11 @@
 name: Execute GitHub App Fetcher
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggers in the browser
+  push: # FORCES GitHub to register and run the workflow right now
+    branches:
+      - main
+      - master
 
 permissions:
   contents: write
@@ -16,7 +20,7 @@ jobs:
       - name: Install Python Environment
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.11' # Specify exact minor version format
 
       - name: Install Dependencies
         run: |
@@ -31,11 +35,10 @@ jobs:
           APP_ID: ${{ secrets.APP_ID }}
         run: python run_app.py
 
-      # ADD THIS FINAL STEP TO SAVE THE DATA RIGHT ON GITHUB
       - name: Commit and Save the Profile Report
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@://github.com"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add profile_report.md || true
           git commit -m "Docs: update fetched profile report markdown asset [skip ci]" || true
           git push || true
