@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GitHub App Frontend Dashboard</title>
+
     <style>
       :root {
         --bg-canvas: #0d1117;
@@ -14,6 +15,11 @@
         --text-secondary: #8b949e;
         --accent-blue: #58a6ff;
         --border-default: #30363d;
+        --error: #ff7b72;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
@@ -27,22 +33,26 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        min-height: 100vh;
       }
 
-      .container {
+      .container,
+      .dashboard-card {
         width: 100%;
         max-width: 500px;
         background-color: var(--bg-surface);
-        padding: 24px;
-        border-radius: 6px;
         border: 1px solid var(--border-default);
-        box-sizing: border-box;
+        border-radius: 6px;
+        padding: 24px;
+      }
+
+      .container {
         margin-bottom: 24px;
         text-align: center;
       }
 
       h2 {
-        margin-top: 0;
+        margin: 0;
         font-size: 20px;
         font-weight: 600;
         color: var(--accent-blue);
@@ -56,6 +66,7 @@
 
       input {
         flex: 1;
+        min-width: 0;
         background-color: var(--bg-canvas);
         color: var(--text-primary);
         border: 1px solid var(--border-default);
@@ -85,15 +96,38 @@
         background-color: var(--bg-button-hover);
       }
 
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
       .dashboard-card {
-        width: 100%;
-        max-width: 500px;
-        background-color: var(--bg-surface);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        padding: 24px;
-        box-sizing: border-box;
         display: none;
+      }
+
+      .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        text-align: left;
+        margin-bottom: 16px;
+      }
+
+      .avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 1px solid var(--border-default);
+      }
+
+      .profile-name {
+        margin: 0 0 4px;
+        font-size: 20px;
+      }
+
+      .profile-login {
+        color: var(--text-secondary);
+        font-size: 14px;
       }
 
       .profile-bio {
@@ -112,11 +146,23 @@
         text-align: left;
       }
 
+      .stat {
+        color: var(--accent-blue);
+        font-weight: 600;
+      }
+
+      .repo-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        text-align: left;
+      }
+
       .repo-list {
         list-style: none;
         padding: 0;
         margin: 0;
-        max-height: 250px;
+        max-height: 300px;
         overflow-y: auto;
         text-align: left;
       }
@@ -131,134 +177,289 @@
         border-bottom: none;
       }
 
-      .repo-item a {
+      .repo-link {
         color: var(--accent-blue);
         text-decoration: none;
         font-weight: 600;
       }
 
-      .repo-item a:hover {
+      .repo-link:hover {
         text-decoration: underline;
       }
 
+      .repo-meta {
+        color: var(--text-secondary);
+        font-size: 12px;
+        margin-top: 4px;
+      }
+
       .error-msg {
-        color: #ff7b72;
+        color: var(--error);
         font-size: 14px;
         margin-top: 12px;
         display: none;
       }
+
+      .loading {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin-top: 16px;
+        display: none;
+      }
+
+      .profile-link {
+        display: inline-block;
+        margin-top: 16px;
+        color: var(--accent-blue);
+        font-size: 14px;
+        text-decoration: none;
+      }
+
+      .profile-link:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
+
   <body>
     <div class="container">
       <h2>GitHub Web Profile Dashboard</h2>
+
       <div class="input-group">
         <input
           type="text"
           id="usernameInput"
           placeholder="Type a GitHub username..."
+          autocomplete="off"
         />
-        <button onclick="fetchProfileData()">Search</button>
+
+        <button id="searchButton" type="button">Search</button>
       </div>
+
+      <div id="loading" class="loading">Loading GitHub profile...</div>
+
       <div id="errorBox" class="error-msg"></div>
     </div>
 
     <div id="dashboardCard" class="dashboard-card">
-      <h3 id="profileName" style="margin: 0 0 4px 0; text-align: left">--</h3>
+      <div class="profile-header">
+        <img
+          id="profileAvatar"
+          class="avatar"
+          src=""
+          alt="GitHub profile avatar"
+        />
+
+        <div>
+          <h3 id="profileName" class="profile-name">--</h3>
+          <div id="profileLogin" class="profile-login">@--</div>
+        </div>
+      </div>
+
       <div id="profileBio" class="profile-bio">--</div>
+
       <div class="profile-stats">
         Public Repos:
-        <span id="statRepos" style="color: var(--accent-blue)">0</span> |
-        Followers:
-        <span id="statFollowers" style="color: var(--accent-blue)">0</span>
+        <span id="statRepos" class="stat">0</span>
+        | Followers:
+        <span id="statFollowers" class="stat">0</span>
       </div>
-      <div
-        style="
-          font-size: 14px;
-          font-weight: 600;
-          margin-bottom: 10px;
-          text-align: left;
-        "
-      >
-        📦 Public Repositories:
-      </div>
+
+      <div class="repo-title">📦 Public Repositories</div>
+
       <ul id="repoList" class="repo-list"></ul>
+
+      <a
+        id="profileLink"
+        class="profile-link"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        View GitHub Profile →
+      </a>
     </div>
 
     <script>
-      // Bind enter-key function shortcut
-      document
-        .getElementById('usernameInput')
-        .addEventListener('keypress', function (e) {
-          if (e.key === 'Enter') {
-            fetchProfileData();
-          }
-        });
+      const usernameInput = document.getElementById('usernameInput');
+      const searchButton = document.getElementById('searchButton');
+      const errorBox = document.getElementById('errorBox');
+      const loading = document.getElementById('loading');
+      const dashboardCard = document.getElementById('dashboardCard');
+
+      const profileAvatar = document.getElementById('profileAvatar');
+      const profileName = document.getElementById('profileName');
+      const profileLogin = document.getElementById('profileLogin');
+      const profileBio = document.getElementById('profileBio');
+      const statRepos = document.getElementById('statRepos');
+      const statFollowers = document.getElementById('statFollowers');
+      const repoList = document.getElementById('repoList');
+      const profileLink = document.getElementById('profileLink');
+
+      usernameInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          fetchProfileData();
+        }
+      });
+
+      searchButton.addEventListener('click', fetchProfileData);
 
       async function fetchProfileData() {
-        const username = document.getElementById('usernameInput').value.trim();
-        const errorBox = document.getElementById('errorBox');
-        const card = document.getElementById('dashboardCard');
+        const username = usernameInput.value.trim();
 
-        if (!username) return;
-        errorBox.style.display = 'none';
+        if (!username) {
+          showError('Please enter a GitHub username.');
+          return;
+        }
+
+        resetState();
+        setLoading(true);
 
         try {
-          // FIXED STRINGS: Explicit directory forward slashes separating resource paths
-          const userUrl = 'https://github.com/' + username;
-          const reposUrl =
-            'https://github.com/' +
-            username +
-            '/repos?per_page=15&sort=updated';
+          /*
+           * GitHub REST API endpoints.
+           *
+           * IMPORTANT:
+           * github.com/<username>
+           * is the web page.
+           *
+           * api.github.com/users/<username>
+           * is the REST API.
+           */
 
-          const userRes = await fetch(userUrl, {
-            headers: { Accept: 'application/vnd.github+json' },
-          });
+          const userUrl = `https://api.github.com/users/${encodeURIComponent(username)}`;
+
+          const reposUrl =
+            `https://api.github.com/users/${encodeURIComponent(username)}/repos` +
+            `?per_page=15&sort=updated`;
+
+          const headers = {
+            Accept: 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28',
+          };
+
+          // Fetch profile and repositories in parallel.
+          const [userRes, reposRes] = await Promise.all([
+            fetch(userUrl, { headers }),
+            fetch(reposUrl, { headers }),
+          ]);
 
           if (userRes.status === 404) {
-            errorBox.innerText = `User '${username}' does not exist.`;
-            errorBox.style.display = 'block';
-            card.style.display = 'none';
+            showError(`User "${username}" does not exist.`);
             return;
-          } else if (!userRes.ok) {
-            errorBox.innerText = `API error occurred. Status Code: ${userRes.status}`;
-            errorBox.style.display = 'block';
-            card.style.display = 'none';
+          }
+
+          if (userRes.status === 403 || reposRes.status === 403) {
+            showError(
+              'GitHub API rate limit exceeded. Please wait and try again.',
+            );
             return;
+          }
+
+          if (!userRes.ok) {
+            throw new Error(
+              `GitHub API error: ${userRes.status} ${userRes.statusText}`,
+            );
+          }
+
+          if (!reposRes.ok) {
+            throw new Error(
+              `Repository API error: ${reposRes.status} ${reposRes.statusText}`,
+            );
           }
 
           const userData = await userRes.json();
-
-          const reposRes = await fetch(reposUrl);
           const reposData = await reposRes.json();
 
-          // Mapping items cleanly onto DOM interface selectors
-          document.getElementById('profileName').innerText =
-            userData.name || userData.login;
-          document.getElementById('profileBio').innerText =
-            userData.bio || 'No bio available.';
-          document.getElementById('statRepos').innerText =
-            userData.public_repos;
-          document.getElementById('statFollowers').innerText =
-            userData.followers;
+          renderProfile(userData);
+          renderRepositories(reposData);
 
-          const list = document.getElementById('repoList');
-          list.innerHTML = '';
+          dashboardCard.style.display = 'block';
+        } catch (error) {
+          console.error(error);
 
-          reposData.forEach((repo) => {
-            const li = document.createElement('li');
-            li.className = 'repo-item';
-            li.innerHTML = `<a href="${repo.html_url}" target="_blank">📦 ${repo.name}</a> ${repo.language ? `<span style="color:var(--text-secondary); font-size:12px;">(${repo.language})</span>` : ''}`;
-            list.appendChild(li);
-          });
-
-          card.style.display = 'block';
-        } catch (err) {
-          errorBox.innerText =
-            'Network transmission error. Check your connection status.';
-          errorBox.style.display = 'block';
-          card.style.display = 'none';
+          showError(
+            'Unable to load the GitHub profile. Please check your connection and try again.',
+          );
+        } finally {
+          setLoading(false);
         }
+      }
+
+      function renderProfile(user) {
+        profileAvatar.src = user.avatar_url;
+        profileAvatar.alt = `${user.login}'s GitHub avatar`;
+
+        profileName.textContent = user.name || user.login;
+        profileLogin.textContent = `@${user.login}`;
+
+        profileBio.textContent = user.bio || 'No bio available.';
+
+        statRepos.textContent = user.public_repos;
+        statFollowers.textContent = user.followers;
+
+        profileLink.href = user.html_url;
+      }
+
+      function renderRepositories(repositories) {
+        repoList.innerHTML = '';
+
+        if (!repositories.length) {
+          const li = document.createElement('li');
+          li.className = 'repo-item';
+          li.textContent = 'No public repositories found.';
+          repoList.appendChild(li);
+          return;
+        }
+
+        repositories.forEach((repo) => {
+          const li = document.createElement('li');
+          li.className = 'repo-item';
+
+          const link = document.createElement('a');
+          link.className = 'repo-link';
+          link.href = repo.html_url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = `📦 ${repo.name}`;
+
+          const meta = document.createElement('div');
+          meta.className = 'repo-meta';
+
+          const metadata = [];
+
+          if (repo.language) {
+            metadata.push(repo.language);
+          }
+
+          metadata.push(`${repo.stargazers_count} ⭐`);
+
+          metadata.push(`${repo.forks_count} forks`);
+
+          meta.textContent = metadata.join(' · ');
+
+          li.appendChild(link);
+          li.appendChild(meta);
+
+          repoList.appendChild(li);
+        });
+      }
+
+      function resetState() {
+        errorBox.style.display = 'none';
+        dashboardCard.style.display = 'none';
+        repoList.innerHTML = '';
+      }
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.style.display = 'block';
+      }
+
+      function setLoading(isLoading) {
+        loading.style.display = isLoading ? 'block' : 'none';
+        searchButton.disabled = isLoading;
+        usernameInput.disabled = isLoading;
       }
     </script>
   </body>
