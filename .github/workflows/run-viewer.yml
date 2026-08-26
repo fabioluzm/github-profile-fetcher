@@ -24,9 +24,9 @@ jobs:
 
       - name: Reconstruct the Private Key File dynamically
         run: |
-          echo "${{ secrets.MY_PRIVATE_KEY }}" > private_key.pem
+          echo "${{ secrets.PRIVATE_KEY }}" > private_key.pem
 
       - name: Run Headless Application Script
         env:
-          MY_APP_ID_SECRET: ${{ secrets.MY_APP_ID }}
+          APP_ID: ${{ secrets.APP_ID }}
         run: python run_app.py
