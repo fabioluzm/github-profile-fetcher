@@ -1,0 +1,9 @@
+# Ignore local environment configuration
+.env
+
+# Ignore sensitive cryptographic private keys
+*.pem
+
+# Ignore Python cache folders
+__pycache__/
+*.pyc

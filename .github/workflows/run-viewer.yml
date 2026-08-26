@@ -1,0 +1,41 @@
+name: Execute GitHub App Fetcher
+
+on:
+  # Allows you to press a button on GitHub to manually run the script anytime
+  workflow_dispatch:
+
+permissions:
+  contents: write # Allows the runner to save the profile_report.md back to your repo
+
+jobs:
+  run-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Layout
+        uses: actions/checkout@v4
+
+      - name: Install Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-python: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          pip install PyJWT cryptography requests
+
+      - name: Reconstruct the Private Key File dynamically
+        run: |
+          echo "${{ secrets.GITHUB_PRIVATE_KEY }}" > private_key.pem
+
+      - name: Run Headless Application Script
+        env:
+          GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID }}
+        run: python run_app.py
+
+      - name: Commit and Save the Profile Report
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@://github.com"
+          git add profile_report.md || true
+          git commit -m "Docs: update fetched profile report markdown asset [skip ci]" || true
+          git push || true
