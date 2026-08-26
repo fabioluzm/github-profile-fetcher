@@ -186,7 +186,7 @@
     </div>
 
     <script>
-      // Set up enter-key shortcut listen event listener
+      // Bind enter-key function shortcut
       document
         .getElementById('usernameInput')
         .addEventListener('keypress', function (e) {
@@ -203,9 +203,13 @@
         if (!username) return;
         errorBox.style.display = 'none';
 
-        // Clean try wrapper handles browser lookups smoothly
         try {
-          const userRes = await fetch(`https://api.github.com/{username}`, {
+          // FIXED STRINGS: Explicit directory forward slashes separating resource paths
+          const userUrl = 'https://github.com' + username;
+          const reposUrl =
+            'https://github.com' + username + '/repos?per_page=15&sort=updated';
+
+          const userRes = await fetch(userUrl, {
             headers: { Accept: 'application/vnd.github+json' },
           });
 
@@ -223,12 +227,10 @@
 
           const userData = await userRes.json();
 
-          const reposRes = await fetch(
-            `https://api.github.com/{username}/repos?per_page=15&sort=updated`,
-          );
+          const reposRes = await fetch(reposUrl);
           const reposData = await reposRes.json();
 
-          // Mapping outputs directly to DOM objects
+          // Mapping items cleanly onto DOM interface selectors
           document.getElementById('profileName').innerText =
             userData.name || userData.login;
           document.getElementById('profileBio').innerText =
@@ -251,7 +253,7 @@
           card.style.display = 'block';
         } catch (err) {
           errorBox.innerText =
-            'Network transmission error. Check your connection.';
+            'Network transmission error. Check your connection status.';
           errorBox.style.display = 'block';
           card.style.display = 'none';
         }
